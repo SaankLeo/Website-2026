@@ -72,7 +72,8 @@ document.addEventListener('scrollend', (e) => {
     }
 }, { capture: true });
 
-// Target switching: Main pages spawn new ribbons, sub-pages append to current ribbon
+// Target switching: from landing page spawns new full-width tracks,
+// from inside pages appends half-width windows to current track
 document.addEventListener('fx:config', (e) => {
   const trigger = e.detail.cfg.trigger;
   if (!trigger) return;
@@ -91,7 +92,9 @@ document.addEventListener('fx:config', (e) => {
     return;
   }
 
-  if (elt.hasAttribute('fx-main-page')) {
+  const fromRoot = elt.closest('.niri-window')?.id === 'root-window';
+
+  if (fromRoot) {
     const footer = document.querySelector('.site-footer');
     if (footer) {
       e.detail.cfg.target = footer;
@@ -123,7 +126,7 @@ function injectCloseBtn(container) {
   });
 }
 
-// Shell stripping and Mobile injection
+// Shell stripping, sizing, and track injection
 document.addEventListener('fx:after', (e) => {
   const trigger = e.detail.cfg.trigger;
   const elt = trigger?.target.closest('[fx-action]');
@@ -139,9 +142,12 @@ document.addEventListener('fx:after', (e) => {
     }
     content.setAttribute('tabindex', '-1');
     e.detail.cfg.newWinId = content.id;
-    
-    if (elt && elt.hasAttribute('fx-main-page')) {
-      // Wrap main pages in a new horizontal track
+
+    const fromRoot = elt && elt.closest('.niri-window')?.id === 'root-window';
+
+    if (fromRoot) {
+      content.classList.add('w-full');
+      // Wrap in a new horizontal track
       const ribbon = document.createElement('div');
       ribbon.className = 'niri-horizontal-track';
       ribbon.id = 'track-' + Math.random().toString(36).substr(2, 9);
@@ -152,6 +158,7 @@ document.addEventListener('fx:after', (e) => {
       injectCloseBtn(ribbon);
       e.detail.cfg.text = ribbon.outerHTML;
     } else {
+      // Append half-width to current track
       const temp = document.createElement('div');
       temp.appendChild(content);
       injectCloseBtn(temp);
