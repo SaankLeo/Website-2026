@@ -55,8 +55,8 @@ body.overview-mode {
     overflow: auto;
     min-height: 100vh;
     box-sizing: border-box;
-    background: rgba(0, 12, 35, 0.4);
-    backdrop-filter: blur(20px);
+    background: rgba(0, 8, 24, 0.3);
+    backdrop-filter: blur(20px) saturate(180%);
 }
 
 body.overview-mode::before {
@@ -66,8 +66,8 @@ body.overview-mode::before {
     left: 0;
     width: 100%;
     height: 100%;
-    background: rgba(0, 12, 35, 0.4);
-    backdrop-filter: blur(24px);
+    background: radial-gradient(circle at 50% 50%, rgba(0, 170, 254, 0.05), transparent 70%);
+    backdrop-filter: blur(32px) saturate(200%);
     z-index: -1;
 }
 
@@ -76,22 +76,29 @@ body.overview-mode .niri-vertical-track {
     transform: none;
     overflow: visible;
     height: auto;
-    gap: 4rem;
+    gap: 5rem;
 }
-
 body.overview-mode .niri-horizontal-track {
     overflow-x: auto;
     overflow-y: hidden;
     min-height: var(--app-height);
     height: var(--app-height);
-    margin-bottom: 2rem;
+    margin-bottom: 3rem;
     scrollbar-width: none;
     position: relative;
-    padding: 4rem 1.5rem 1.5rem 1.5rem;
+    padding: 5rem 2.5rem 2.5rem 2.5rem;
     box-sizing: border-box;
-    background: rgba(255, 255, 255, 0.03);
-    border-radius: 32px;
-    border: 1px solid rgba(255, 255, 255, 0.05);
+    background: linear-gradient(135deg, rgba(255, 255, 255, 0.05), rgba(255, 255, 255, 0.01));
+    border-radius: 48px;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    box-shadow: 
+        inset 0 1px 0 rgba(255, 255, 255, 0.1),
+        inset 0 -1px 0 rgba(0, 0, 0, 0.2),
+        0 20px 40px rgba(0, 0, 0, 0.3);
+    backdrop-filter: blur(10px);
+}
+
+    box-shadow: inset 0 1px 1px rgba(255, 255, 255, 0.05);
 }
 
 body.overview-mode .niri-horizontal-track::-webkit-scrollbar {
@@ -114,17 +121,41 @@ body.overview-mode .niri-window {
     cursor: pointer;
     height: calc(var(--app-height) - 3rem);
     flex: 0 0 var(--overview-window-basis, calc(var(--app-width) * 0.45 - 2.25rem));
-    border-radius: 24px;
-    box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5);
-    transition: transform 0.3s cubic-bezier(0.2, 0.8, 0.2, 1), box-shadow 0.3s ease;
-    border: 1px solid rgba(0, 170, 254, 0.5);
-    background: rgba(0, 12, 35, 0.8);
+    border-radius: 32px;
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    background: rgba(20, 30, 60, 0.4);
+    backdrop-filter: blur(16px) saturate(180%);
+    box-shadow: 
+        0 30px 60px rgba(0, 0, 0, 0.5),
+        inset 0 1px 1px rgba(255, 255, 255, 0.2),
+        inset 0 -1px 1px rgba(0, 0, 0, 0.3);
+    transition: transform 0.5s cubic-bezier(0.15, 1, 0.3, 1), box-shadow 0.3s ease, border-color 0.3s ease;
     overflow: hidden;
 }
 
 body.overview-mode .niri-window:hover {
-    transform: scale(1.02);
-    box-shadow: 0 30px 60px rgba(0, 0, 0, 0.7);
+    transform: scale(1.04) translateY(-8px);
+    box-shadow: 
+        0 50px 100px rgba(0, 0, 0, 0.7),
+        inset 0 1px 2px rgba(255, 255, 255, 0.3);
+    border-color: rgba(255, 255, 255, 0.3);
+}
+
+dialog {
+    background: rgba(10, 20, 40, 0.6);
+    backdrop-filter: blur(40px) saturate(200%);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 32px;
+    color: #fff;
+    padding: 2.5rem;
+    box-shadow: 
+        0 40px 100px rgba(0, 0, 0, 0.8),
+        inset 0 1px 0 rgba(255, 255, 255, 0.15);
+}
+
+dialog::backdrop {
+    background: rgba(0, 0, 0, 0.5);
+    backdrop-filter: blur(8px);
 }
 
 /* Preserve full-width windows opened from root (class added in niri-engine.js). */
@@ -530,13 +561,60 @@ body.overview-mode .site-footer {
 #help-modal ul { list-style: none; padding: 0; }
 #help-modal li { margin: 0.5rem 0; }
 #help-modal code { background: rgba(0, 170, 254, 0.1); padding: 0.2rem 0.4rem; border-radius: 4px; }
-#help-modal button { 
-    background: rgba(0, 170, 254, 0.2); 
-    border: 1px solid #00aafe; 
+#close-track-modal {
+    max-width: 600px;
+    text-align: center;
+}
+
+#close-track-modal .modal-actions {
+    display: flex;
+    gap: 1rem;
+    margin-top: 2rem;
+    justify-content: center;
+    flex-wrap: wrap;
+}
+
+#help-modal button,
+#close-track-modal button { 
+    background: rgba(255, 255, 255, 0.05); 
+    border: 1px solid rgba(255, 255, 255, 0.1); 
     color: #fff; 
-    padding: 0.5rem 1rem; 
-    border-radius: 6px; 
+    padding: 0.75rem 1.5rem; 
+    border-radius: 12px; 
     cursor: pointer;
+    font-family: var(--font-family-sans);
+    font-weight: 600;
+    transition: all 0.3s cubic-bezier(0.2, 0.8, 0.2, 1);
+    backdrop-filter: blur(8px);
+}
+
+#help-modal button:hover,
+#close-track-modal button:hover {
+    background: rgba(0, 170, 254, 0.2);
+    border-color: rgba(0, 170, 254, 0.4);
+    transform: scale(1.05) translateY(-2px);
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3);
+}
+
+#btn-close-all {
+    background: rgba(255, 59, 48, 0.1) !important;
+    border-color: rgba(255, 59, 48, 0.2) !important;
+}
+
+#btn-close-all:hover {
+    background: rgba(255, 59, 48, 0.2) !important;
+    border-color: rgba(255, 59, 48, 0.4) !important;
+}
+
+.btn-cancel {
+    border-color: rgba(255, 255, 255, 0.2) !important;
+    color: #a1a1aa !important;
+}
+
+.btn-cancel:hover {
+    border-color: rgba(255, 255, 255, 0.4) !important;
+    color: #fff !important;
+    background: rgba(255, 255, 255, 0.1) !important;
 }
 
 /* Ensure paragraphs have comfortable spacing */
