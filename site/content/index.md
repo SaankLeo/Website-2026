@@ -70,7 +70,8 @@ body.overview-mode #root-window::before {
   width: 100%;
   max-width: 1000px;
   margin: 0 auto;
-  z-index: 1;
+  z-index: 10;
+  position: relative;
 }
 
 .niri-root-content {
@@ -79,40 +80,43 @@ body.overview-mode #root-window::before {
   align-items: center;
   text-align: center;
   width: 100%;
+  position: relative;
+  z-index: 11;
 }
 
 .root-logo {
   width: 470px;
   height: auto;
   margin-bottom: 1.5rem;
-  opacity: 0.9;
-  filter: drop-shadow(0 0 20px rgba(255,255,255,0.05));
+  opacity: 1;
+  filter: drop-shadow(0 0 30px rgba(0, 170, 254, 0.2));
   transition: all 0.25s ease;
 }
 
 .root-logo:hover {
-  opacity: 1;
-  transform: translateY(-2px);
+  transform: translateY(-2px) scale(1.01);
 }
 
 .root-eyebrow {
   font-size: 1.5rem;
   font-weight: 400;
   letter-spacing: 0.15em;
-  color: #6b7fa3;
+  color: #a3c4ec;
   margin: 0 0 1.25rem 0;
   text-transform: uppercase;
   box-sizing: border-box;
+  text-shadow: 0 2px 10px rgba(0,0,0,0.3);
 }
 
 .root-tagline {
   font-size: clamp(1rem, 3vw, 1.35rem);
   font-weight: 400;
   line-height: 1.6;
-  color: #a1a1aa !important;
+  color: #e2e8f0 !important;
   margin: 0 0 3rem 0;
   width: 100%;
   box-sizing: border-box;
+  text-shadow: 0 2px 10px rgba(0,0,0,0.3);
 }
 
 .root-nav.glass-pill {
@@ -121,19 +125,31 @@ body.overview-mode #root-window::before {
   flex-wrap: nowrap;
   align-items: stretch;
   justify-content: center;
-  background: rgba(0, 12, 35, 0.4);
-  backdrop-filter: blur(24px) saturate(180%);
-  -webkit-backdrop-filter: blur(24px) saturate(180%);
-  border: 1px solid rgba(0, 170, 254, 0.08);
-  border-radius: 16px;
+  background: rgba(10, 20, 40, 0.5);
+  backdrop-filter: blur(28px) saturate(190%);
+  -webkit-backdrop-filter: blur(28px) saturate(190%);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 20px;
   padding: 0;
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.1);
+  box-shadow: 
+    0 20px 40px rgba(0, 0, 0, 0.4),
+    inset 0 1px 0 rgba(255, 255, 255, 0.15),
+    inset 0 -1px 0 rgba(0, 0, 0, 0.2);
   overflow: hidden;
   isolation: isolate;
   transform: translateZ(0);
   box-sizing: border-box;
-  margin-top: 2rem;
-  width: min(95%, 1000px);
+  margin-top: 3rem;
+  width: min(95%, 900px);
+  transition: all 0.4s cubic-bezier(0.15, 1, 0.3, 1);
+}
+
+.root-nav.glass-pill:hover {
+  transform: translateY(-2px) scale(1.005);
+  border-color: rgba(255, 255, 255, 0.2);
+  box-shadow: 
+    0 30px 60px rgba(0, 0, 0, 0.5),
+    inset 0 1px 0 rgba(255, 255, 255, 0.25);
 }
 
 .nav-separator {
@@ -148,7 +164,7 @@ body.overview-mode #root-window::before {
   text-decoration: none;
   font-weight: 600;
   padding: 1.25rem 2.5rem;
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  transition: all 0.4s cubic-bezier(0.15, 1, 0.3, 1);
   position: relative;
   background: transparent;
   flex: 1 1 auto;
@@ -165,20 +181,22 @@ body.overview-mode #root-window::before {
 .root-nav .m-link::before {
   content: "";
   position: absolute;
-  top: -2px; left: -2px; right: -2px; bottom: -2px;
-  background: rgba(0, 170, 254, 0.25);
+  inset: 0;
+  background: rgba(255, 255, 255, 0.05);
   opacity: 0;
-  transition: opacity 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  transition: all 0.3s ease;
   z-index: -1;
 }
 
 .root-nav .m-link:hover::before, .root-nav .m-link:focus::before {
   opacity: 1;
+  background: rgba(0, 170, 254, 0.15);
 }
 
 .root-nav .m-link:hover, .root-nav .m-link:focus {
   color: #ffffff;
   outline: none;
+  transform: scale(1.02);
 }
 
 /* Scaling for overview mode via CSS transformations to ensure layout integrity */
@@ -257,8 +275,25 @@ body.overview-mode .niri-landing {
           requestAnimationFrame(animate);
           return;
         }
-        currentX += (targetX - currentX) * 0.15;
-        currentY += (targetY - currentY) * 0.15;
+
+        if (window.innerWidth <= 1024) {
+          // Mobile: Sine-wave path from bottom to top
+          const rect = rootWindow.getBoundingClientRect();
+          const time = Date.now();
+          const speed = 0.08; 
+          
+          // Move vertically from bottom to top
+          currentY = rect.height - ((time * speed) % (rect.height + 400)) + 200;
+          
+          // Oscillate horizontally to create the wave motion
+          const amplitude = rect.width * 0.35;
+          currentX = (rect.width / 2) + Math.sin(time / 700) * amplitude;
+        } else {
+          // Desktop: Pointer following
+          currentX += (targetX - currentX) * 0.15;
+          currentY += (targetY - currentY) * 0.15;
+        }
+
         rootWindow.style.setProperty('--cursor-x', `${currentX}px`);
         rootWindow.style.setProperty('--cursor-y', `${currentY}px`);
         if (rootWindow.isConnected) {
